@@ -1,11 +1,14 @@
-import dotenv from "dotenv";
 import routes from "./routes";
+import dotenv from "dotenv";
 import express from "express";
+
+const app = express();
 
 dotenv.config();
 
-const app = express();
-const port = process.env.PORT ?? 3000;
+const { PORT = "3000" } = process.env;
+
+const port = ~~PORT;
 
 app.disable("x-powered-by");
 
