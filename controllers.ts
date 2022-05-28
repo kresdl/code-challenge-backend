@@ -4,9 +4,20 @@ import axios from "axios";
 import cookie from "cookie";
 import twilio from "twilio";
 
+declare global {
+  namespace Express {
+    interface Request {
+      auth: string;
+      user: User;
+    }
+  }
+}
+
 const accountSid = process.env.TWILIO_ACCOUNT_SID;
 const authToken = process.env.TWILIO_AUTH_TOKEN;
 const sendingNumber = process.env.TWILIO_NUMBER;
+
+const twilioClient = twilio(accountSid, authToken);
 
 interface Position {
   latitude: number;
@@ -14,47 +25,21 @@ interface Position {
 }
 
 interface User {
-  accessToken: string;
-  phoneNumber: string;
+  phoneNumber?: string;
   position?: Position;
 }
+
+const users = new Map<string, User>();
+
+const getAuth = (req: Request) => cookie.parse(req.headers.cookie ?? "").auth;
 
 export const cors = (req: Request, res: Response, next: NextFunction) => {
   res.set("Access-Control-Allow-Origin", "*");
   res.set("Access-Control-Allow-Methods", "POST, GET, PUT, DELETE, OPTIONS");
   res.set("Access-Control-Allow-Headers", "*, Authorization");
   res.set("Access-Control-Expose-Headers", "*, Authorization");
-
   if (req.method === "OPTIONS") return res.sendStatus(200);
-
   next();
-};
-
-const users = new Map<string, User>();
-
-export const auth: RequestHandler = async (req, res, next) => {
-  const { auth } = cookie.parse(req.headers.cookie ?? "");
-  if (!auth) return res.sendStatus(403);
-
-  const user = users.get(auth);
-  if (!user) return res.sendStatus(403);
-
-  const config = {
-    headers: {
-      Authorization: user.accessToken,
-    },
-  };
-
-  try {
-    const response = await axios.get("https://www.googleapis.com/oauth2/v3/userinfo", config);
-    if (response.data) return next();
-    res.sendStatus(response.status ?? 500);
-  } catch (err) {
-    console.error(err);
-    const { response } = err as AxiosError;
-    const status = response && response.status;
-    res.sendStatus(status == 400 ? 403 : status ?? 500);
-  }
 };
 
 export const signIn: RequestHandler = async (req, res) => {
@@ -74,13 +59,13 @@ export const signIn: RequestHandler = async (req, res) => {
 
   try {
     const { data } = await axios.post("https://oauth2.googleapis.com/token", params, config);
-    const { id_token, access_token } = data;
-    users.set(id_token, { accessToken: access_token });
+    const { id_token } = data;
+    users.set(id_token, {});
     const setCookie = cookie.serialize("auth", id_token, {
       maxAge: 60 * 60 * 24,
     });
     res.setHeader("Set-Cookie", setCookie);
-    res.json({ jwt: id_token });
+    res.sendStatus(200);
   } catch (err) {
     console.error(err);
     const { response } = err as AxiosError;
@@ -90,33 +75,30 @@ export const signIn: RequestHandler = async (req, res) => {
 };
 
 export const signOut: RequestHandler = (req, res) => {
-  const { auth } = cookie.parse(req.headers.cookie ?? "");
+  const auth = getAuth(req);
   users.delete(auth);
   res.sendStatus(200);
 };
 
-export const subscribe: RequestHandler = async (req, res) => {
-  const { auth } = cookie.parse(req.headers.cookie ?? "");
+export const auth: RequestHandler = (req, res, next) => {
+  const auth = getAuth(req);
   const user = users.get(auth);
-  if (!user) return res.sendStatus(400);
-  const { phoneNumber } = req.body;
+  if (!user) return res.sendStatus(403);
+  Object.assign(req, { auth, user });
+  next();
+};
 
-  users.set(auth, { ...user, phoneNumber });
+export const subscribe: RequestHandler = async (req, res) => {
+  const { phoneNumber } = req.body;
+  users.set(req.auth, { phoneNumber });
+  res.sendStatus(200);
 };
 
 export const updatePosition: RequestHandler = async (req, res) => {
-  const { auth } = cookie.parse(req.headers.cookie ?? "");
-  const user = users.get(auth);
-  if (!user) return res.sendStatus(400);
   const { latitude, longitude } = req.body;
-
-  users.set(auth, {
-    ...user,
-    position: {
-      latitude: +latitude,
-      longitude: +longitude,
-    },
-  });
+  const position = { latitude: +latitude, longitude: +longitude };
+  users.set(req.auth, { ...req.user, position });
+  res.sendStatus(200);
 };
 
 /*
