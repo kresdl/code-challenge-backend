@@ -2,6 +2,22 @@ import { AxiosError } from "axios";
 import { NextFunction, Request, RequestHandler, Response } from "express";
 import axios from "axios";
 import cookie from "cookie";
+import twilio from "twilio";
+
+const accountSid = process.env.TWILIO_ACCOUNT_SID;
+const authToken = process.env.TWILIO_AUTH_TOKEN;
+const sendingNumber = process.env.TWILIO_NUMBER;
+
+interface Position {
+  latitude: number;
+  longitude: number;
+}
+
+interface User {
+  accessToken: string;
+  phoneNumber: string;
+  position?: Position;
+}
 
 export const cors = (req: Request, res: Response, next: NextFunction) => {
   res.set("Access-Control-Allow-Origin", "*");
@@ -14,13 +30,18 @@ export const cors = (req: Request, res: Response, next: NextFunction) => {
   next();
 };
 
-const users = new Map<string, string>();
+const users = new Map<string, User>();
 
 export const auth: RequestHandler = async (req, res, next) => {
-  const cookies = cookie.parse(req.headers.cookie ?? "");
+  const { auth } = cookie.parse(req.headers.cookie ?? "");
+  if (!auth) return res.sendStatus(403);
+
+  const user = users.get(auth);
+  if (!user) return res.sendStatus(403);
+
   const config = {
     headers: {
-      Authorization: users.get(cookies.auth) ?? "",
+      Authorization: user.accessToken,
     },
   };
 
@@ -54,7 +75,7 @@ export const signIn: RequestHandler = async (req, res) => {
   try {
     const { data } = await axios.post("https://oauth2.googleapis.com/token", params, config);
     const { id_token, access_token } = data;
-    users.set(id_token, access_token);
+    users.set(id_token, { accessToken: access_token });
     const setCookie = cookie.serialize("auth", id_token, {
       maxAge: 60 * 60 * 24,
     });
@@ -69,7 +90,39 @@ export const signIn: RequestHandler = async (req, res) => {
 };
 
 export const signOut: RequestHandler = (req, res) => {
-  const cookies = cookie.parse(req.headers.cookie ?? "");
-  users.delete(cookies.auth);
+  const { auth } = cookie.parse(req.headers.cookie ?? "");
+  users.delete(auth);
   res.sendStatus(200);
 };
+
+export const subscribe: RequestHandler = async (req, res) => {
+  const { auth } = cookie.parse(req.headers.cookie ?? "");
+  const user = users.get(auth);
+  if (!user) return res.sendStatus(400);
+  const { phoneNumber } = req.body;
+
+  users.set(auth, { ...user, phoneNumber });
+};
+
+export const updatePosition: RequestHandler = async (req, res) => {
+  const { auth } = cookie.parse(req.headers.cookie ?? "");
+  const user = users.get(auth);
+  if (!user) return res.sendStatus(400);
+  const { latitude, longitude } = req.body;
+
+  users.set(auth, {
+    ...user,
+    position: {
+      latitude: +latitude,
+      longitude: +longitude,
+    },
+  });
+};
+
+/*
+  const params = new URLSearchParams({ latitude, longitude });
+  try {
+    const response = await axios.get("http://api.sr.se/api/v2/traffic/messages", { params });
+    response.data
+  }
+*/
