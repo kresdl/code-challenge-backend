@@ -1,5 +1,5 @@
 import { AxiosError } from "axios";
-import { NextFunction, Request, RequestHandler, Response } from "express";
+import { Request, RequestHandler } from "express";
 import axios from "axios";
 import cookie from "cookie";
 import twilio from "twilio";
@@ -33,7 +33,7 @@ const users = new Map<string, User>();
 
 const getAuth = (req: Request) => cookie.parse(req.headers.cookie ?? "").auth;
 
-export const cors = (req: Request, res: Response, next: NextFunction) => {
+export const cors: RequestHandler = (req, res, next) => {
   res.set("Access-Control-Allow-Origin", "*");
   res.set("Access-Control-Allow-Methods", "POST, GET, PUT, DELETE, OPTIONS");
   res.set("Access-Control-Allow-Headers", "*, Authorization");
