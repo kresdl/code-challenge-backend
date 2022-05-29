@@ -1,6 +1,5 @@
 import xml2js from "xml2js";
-import cookie from "cookie";
-import { SRMessage } from "./types";
+import { Message } from "./types";
 import { Request } from "express";
 
 export const parseXML = <T>(xml: string) =>
@@ -13,7 +12,7 @@ export const parseXML = <T>(xml: string) =>
 
 export const compareMessageByDate =
   (date: string) =>
-  ({ createddate }: SRMessage) =>
+  ({ createddate }: Message) =>
     new Date(createddate) > new Date(date);
 
-export const getAuth = (req: Request) => cookie.parse(req.headers.cookie ?? "").auth;
+export const getAuth = (req: Request) => req.headers.authorization?.match(/Bearer\s(.+)/)?.[1] ?? "";

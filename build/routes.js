@@ -2,10 +2,15 @@ import { cors, signIn, auth, signOut, subscribe, updatePosition } from "./contro
 import express from "express";
 import bodyParser from "body-parser";
 const router = express.Router();
+router.use("/", (req, _res, next) => {
+    console.log(req.url, req.headers.authorization);
+    next();
+});
 router.use("/", cors, bodyParser.json());
 router.post("/signin", signIn);
 router.post("/signout", signOut);
 router.use("/", auth);
-router.get("/subscribe", subscribe);
-router.get("/update", updatePosition);
+router.post("/subscribe", subscribe);
+router.post("/update", updatePosition);
 export default router;
+//# sourceMappingURL=routes.js.map

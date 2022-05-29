@@ -10,3 +10,4 @@ app.listen(port, "localhost", () => {
     console.log(`Listening on port ${port}...`);
     //  setInterval(broadcast, 60000);
 });
+//# sourceMappingURL=index.js.map

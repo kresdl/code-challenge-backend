@@ -1,4 +1,4 @@
-export interface SRMessage {
+export interface Message {
   $: {
     priority: string;
   };
@@ -8,11 +8,25 @@ export interface SRMessage {
   description: string;
 }
 
-export interface SRResponse {
+export interface SRTrafficMessages {
   sr: {
     messages: [
       {
-        message: SRMessage[];
+        message: Message[];
+      }
+    ];
+  };
+}
+
+export interface SRTrafficAreas {
+  sr: {
+    areas: [
+      {
+        area: {
+          $: {
+            name: string;
+          };
+        };
       }
     ];
   };

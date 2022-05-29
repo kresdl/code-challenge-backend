@@ -14,6 +14,7 @@ const accountSid = process.env.TWILIO_ACCOUNT_SID;
 const authToken = process.env.TWILIO_AUTH_TOKEN;
 const sendingNumber = process.env.TWILIO_NUMBER;
 const srTrafficAreasAPI = process.env.SR_TRAFFIC_AREAS_API;
+const srTrafficMessagesAPI = process.env.SR_TRAFFIC_MESSAGES_API;
 if (!accountSid)
     throw Error("TWILIO_ACCOUNT_SID not set");
 if (!authToken)
@@ -22,43 +23,51 @@ if (!sendingNumber)
     throw Error("TWILIO_NUMBER not set");
 if (!srTrafficAreasAPI)
     throw Error("SR_TRAFFIC_AREAS_API not set");
+if (!srTrafficMessagesAPI)
+    throw Error("SR_TRAFFIC_MESSAGES_API not set");
+const axiosClient = axios.create({
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+});
 const twilioClient = twilio(accountSid, authToken);
 const now = () => new Date().toString();
 const users = new Map();
+export const notify = (user, auth) => __awaiter(void 0, void 0, void 0, function* () {
+    const { latitude, longitude, lastUpdateAt, phoneNumber } = user;
+    try {
+        const { data: areasXML } = yield axiosClient.get(srTrafficAreasAPI, {
+            params: { latitude, longitude },
+        });
+        const areas = yield parseXML(areasXML);
+        const area = areas.sr.areas[0].area.$.name;
+        const { data: messagesXML } = yield axiosClient.get(srTrafficMessagesAPI, {
+            params: {
+                trafficareaname: area,
+                date: new Date().toDateString(),
+            },
+        });
+        const messages = yield parseXML(messagesXML);
+        const formattedMessages = messages.sr.messages[0].message.filter(compareMessageByDate(lastUpdateAt)).map(msg => {
+            const priority = "Priority: " + msg.$.priority;
+            const createDate = "Time: " + msg.createddate;
+            const exactLocation = "Location: " + msg.exactlocation;
+            const description = "Description: " + msg.description;
+            return [msg.title, priority, createDate, exactLocation, description].join("\n");
+        });
+        if (!formattedMessages.length)
+            return;
+        twilioClient.messages.create({
+            body: formattedMessages.join("\n\n"),
+            from: sendingNumber,
+            to: phoneNumber,
+        });
+        users.set(auth, Object.assign(Object.assign({}, user), { lastUpdateAt: now() }));
+    }
+    catch (error) {
+        console.error(error);
+    }
+});
 export const broadcast = () => {
-    users.forEach((user, auth) => __awaiter(void 0, void 0, void 0, function* () {
-        const { latitude, longitude, lastUpdateAt: lastUpdate, phoneNumber } = user;
-        try {
-            const response = yield axios.get(srTrafficAreasAPI, {
-                params: { latitude, longitude },
-                headers: { "Content-Type": "application/x-www-form-urlencoded" },
-            });
-            try {
-                const data = yield parseXML(response.data);
-                const messages = data.sr.messages[0].message.filter(compareMessageByDate(lastUpdate)).map(msg => {
-                    const priority = "Priority: " + msg.$.priority;
-                    const createDate = "Time: " + msg.createddate;
-                    const exactLocation = "Location: " + msg.exactlocation;
-                    const description = "Description: " + msg.description;
-                    return [msg.title, priority, createDate, exactLocation, description].join("\n");
-                });
-                if (!messages.length)
-                    return;
-                twilioClient.messages.create({
-                    body: messages.join("\n\n"),
-                    from: sendingNumber,
-                    to: phoneNumber,
-                });
-                users.set(auth, Object.assign(Object.assign({}, user), { lastUpdateAt: now() }));
-            }
-            catch (error) {
-                console.error(error);
-            }
-        }
-        catch (error) {
-            const axiosError = error;
-            console.error(axiosError.message);
-        }
-    }));
+    users.forEach(notify);
 };
 export default users;
+//# sourceMappingURL=users.js.map
