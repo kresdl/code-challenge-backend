@@ -1,37 +1,17 @@
 import { AxiosError } from "axios";
-import { Request, RequestHandler } from "express";
+import { RequestHandler } from "express";
 import axios from "axios";
 import cookie from "cookie";
-import twilio from "twilio";
+import { getAuth } from "./utils";
+import users from "./users";
 
-declare global {
-  namespace Express {
-    interface Request {
-      auth: string;
-      user: User;
-    }
-  }
-}
+const oAuthTokenEndpoint = process.env.OAUTH_TOKEN_ENDPOINT;
 
-const accountSid = process.env.TWILIO_ACCOUNT_SID;
-const authToken = process.env.TWILIO_AUTH_TOKEN;
-const sendingNumber = process.env.TWILIO_NUMBER;
+if (!oAuthTokenEndpoint) throw Error("OAUTH_TOKEN_ENDPOINT not set");
 
-const twilioClient = twilio(accountSid, authToken);
+const COOKIE_MAX_AGE = 60 * 60 * 24;
 
-interface Position {
-  latitude: number;
-  longitude: number;
-}
-
-interface User {
-  phoneNumber?: string;
-  position?: Position;
-}
-
-const users = new Map<string, User>();
-
-const getAuth = (req: Request) => cookie.parse(req.headers.cookie ?? "").auth;
+const auths = new Set<string>();
 
 export const cors: RequestHandler = (req, res, next) => {
   res.set("Access-Control-Allow-Origin", "*");
@@ -51,18 +31,15 @@ export const signIn: RequestHandler = async (req, res) => {
     grant_type: "authorization_code",
   });
 
-  const config = {
-    headers: {
-      "Content-Type": "application/x-www-form-urlencoded",
-    },
-  };
-
   try {
-    const { data } = await axios.post("https://oauth2.googleapis.com/token", params, config);
+    const { data } = await axios.post(oAuthTokenEndpoint, {
+      params,
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    });
     const { id_token } = data;
-    users.set(id_token, {});
+    auths.add(id_token);
     const setCookie = cookie.serialize("auth", id_token, {
-      maxAge: 60 * 60 * 24,
+      maxAge: COOKIE_MAX_AGE,
     });
     res.setHeader("Set-Cookie", setCookie);
     res.sendStatus(200);
@@ -82,29 +59,24 @@ export const signOut: RequestHandler = (req, res) => {
 
 export const auth: RequestHandler = (req, res, next) => {
   const auth = getAuth(req);
-  const user = users.get(auth);
-  if (!user) return res.sendStatus(403);
-  Object.assign(req, { auth, user });
+  const isAuth = auths.has(auth);
+  if (!isAuth) return res.sendStatus(403);
   next();
 };
 
 export const subscribe: RequestHandler = async (req, res) => {
-  const { phoneNumber } = req.body;
-  users.set(req.auth, { phoneNumber });
+  const auth = getAuth(req);
+  const { phoneNumber, latitude, longitude } = req.body;
+  const lastUpdate = new Date().toDateString();
+  users.set(auth, { phoneNumber, latitude, longitude, lastUpdateAt: lastUpdate });
   res.sendStatus(200);
 };
 
 export const updatePosition: RequestHandler = async (req, res) => {
+  const auth = getAuth(req);
+  const user = users.get(auth);
+  if (!user) return res.sendStatus(400);
   const { latitude, longitude } = req.body;
-  const position = { latitude: +latitude, longitude: +longitude };
-  users.set(req.auth, { ...req.user, position });
+  users.set(auth, { ...user, latitude, longitude });
   res.sendStatus(200);
 };
-
-/*
-  const params = new URLSearchParams({ latitude, longitude });
-  try {
-    const response = await axios.get("http://api.sr.se/api/v2/traffic/messages", { params });
-    response.data
-  }
-*/

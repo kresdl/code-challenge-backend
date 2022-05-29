@@ -1,10 +1,9 @@
+import "./config";
 import routes from "./routes";
-import dotenv from "dotenv";
 import express from "express";
+import { broadcast } from "./users";
 
 const app = express();
-
-dotenv.config();
 
 const { PORT = "3000" } = process.env;
 
@@ -16,4 +15,5 @@ app.use(routes);
 
 app.listen(port, "localhost", () => {
   console.log(`Listening on port ${port}...`);
+  //  setInterval(broadcast, 60000);
 });
