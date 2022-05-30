@@ -29,20 +29,26 @@ const axiosClient = axios.create({
     headers: { "Content-Type": "application/x-www-form-urlencoded" },
 });
 const twilioClient = twilio(accountSid, authToken);
-const now = () => new Date().toString();
 const users = new Map();
-export const notify = (user, auth) => __awaiter(void 0, void 0, void 0, function* () {
-    const { latitude, longitude, lastUpdateAt, phoneNumber } = user;
+const notify = (user, auth) => __awaiter(void 0, void 0, void 0, function* () {
+    const { position, phoneNumber, lastArea } = user;
+    if (!position)
+        return;
     try {
         const { data: areasXML } = yield axiosClient.get(srTrafficAreasAPI, {
-            params: { latitude, longitude },
+            params: position,
         });
         const areas = yield parseXML(areasXML);
-        const area = areas.sr.areas[0].area.$.name;
+        const area = areas.sr.area[0].$.name;
+        const today = new Date().toDateString();
+        const now = new Date().toString();
+        // If user entered a new area, get all messages for the day
+        const lastUpdateAt = lastArea !== area ? today : user.lastUpdateAt;
+        const thisUpdateAt = now;
         const { data: messagesXML } = yield axiosClient.get(srTrafficMessagesAPI, {
             params: {
                 trafficareaname: area,
-                date: new Date().toDateString(),
+                date: today,
             },
         });
         const messages = yield parseXML(messagesXML);
@@ -56,17 +62,22 @@ export const notify = (user, auth) => __awaiter(void 0, void 0, void 0, function
         if (!formattedMessages.length)
             return;
         twilioClient.messages.create({
-            body: formattedMessages.join("\n\n"),
+            body: "\n" + formattedMessages.join("\n\n"),
             from: sendingNumber,
             to: phoneNumber,
         });
-        users.set(auth, Object.assign(Object.assign({}, user), { lastUpdateAt: now() }));
+        users.set(auth, Object.assign(Object.assign({}, user), { lastUpdateAt: thisUpdateAt, lastArea: area }));
     }
     catch (error) {
         console.error(error);
     }
 });
-export const broadcast = () => {
+export const notifyUser = (auth) => {
+    const user = users.get(auth);
+    if (user)
+        notify(user, auth);
+};
+export const notifyAllUsers = () => {
     users.forEach(notify);
 };
 export default users;

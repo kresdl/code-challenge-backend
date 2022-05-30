@@ -20,21 +20,24 @@ export interface SRTrafficMessages {
 
 export interface SRTrafficAreas {
   sr: {
-    areas: [
+    area: [
       {
-        area: {
-          $: {
-            name: string;
-          };
+        $: {
+          name: string;
         };
       }
     ];
   };
 }
 
-export interface User {
-  phoneNumber: string;
+interface Position {
   latitude: number;
   longitude: number;
+}
+
+export interface User {
+  phoneNumber: string;
+  position?: Position;
   lastUpdateAt: string;
+  lastArea?: string;
 }

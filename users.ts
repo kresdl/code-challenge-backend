@@ -20,25 +20,30 @@ const axiosClient = axios.create({
 });
 
 const twilioClient = twilio(accountSid, authToken);
-
-const now = () => new Date().toString();
-
 const users = new Map<string, User>();
 
-export const notify = async (user: User, auth: string) => {
-  const { latitude, longitude, lastUpdateAt, phoneNumber } = user;
+const notify = async (user: User, auth: string) => {
+  const { position, phoneNumber, lastArea } = user;
+  if (!position) return;
+
   try {
     const { data: areasXML } = await axiosClient.get(srTrafficAreasAPI, {
-      params: { latitude, longitude },
+      params: position,
     });
 
     const areas = await parseXML<SRTrafficAreas>(areasXML);
-    const area = areas.sr.areas[0].area.$.name;
+    const area = areas.sr.area[0].$.name;
+    const today = new Date().toDateString();
+    const now = new Date().toString();
+
+    // If user entered a new area, get all messages for the day
+    const lastUpdateAt = lastArea !== area ? today : user.lastUpdateAt;
+    const thisUpdateAt = now;
 
     const { data: messagesXML } = await axiosClient.get(srTrafficMessagesAPI, {
       params: {
         trafficareaname: area,
-        date: new Date().toDateString(),
+        date: today,
       },
     });
 
@@ -55,17 +60,26 @@ export const notify = async (user: User, auth: string) => {
     if (!formattedMessages.length) return;
 
     twilioClient.messages.create({
-      body: formattedMessages.join("\n\n"),
+      body: "\n" + formattedMessages.join("\n\n"),
       from: sendingNumber,
       to: phoneNumber,
     });
-    users.set(auth, { ...user, lastUpdateAt: now() });
+    users.set(auth, {
+      ...user,
+      lastUpdateAt: thisUpdateAt,
+      lastArea: area,
+    });
   } catch (error) {
     console.error(error);
   }
 };
 
-export const broadcast = () => {
+export const notifyUser = (auth: string) => {
+  const user = users.get(auth);
+  if (user) notify(user, auth);
+};
+
+export const notifyAllUsers = () => {
   users.forEach(notify);
 };
 
