@@ -9,6 +9,6 @@ app.disable("x-powered-by");
 app.use(routes);
 app.listen(port, "0.0.0.0", () => {
     console.log(`Listening on port ${port}...`);
-    setInterval(notifyAllUsers, 60000);
+    setInterval(notifyAllUsers, 30000);
 });
 //# sourceMappingURL=index.js.map

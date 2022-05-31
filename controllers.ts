@@ -1,6 +1,6 @@
 import { RequestHandler } from "express";
 import { getAuth } from "./utils";
-import users, { notifyUser } from "./users";
+import users from "./users";
 import { User } from "./types";
 import { OAuth2Client } from "google-auth-library";
 

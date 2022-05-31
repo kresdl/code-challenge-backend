@@ -62,7 +62,7 @@ const notify = (user, auth) => __awaiter(void 0, void 0, void 0, function* () {
         if (!formattedMessages.length)
             return;
         twilioClient.messages.create({
-            body: "\n" + formattedMessages.join("\n\n"),
+            body: formattedMessages.join("\n\n"),
             from: sendingNumber,
             to: phoneNumber,
         });

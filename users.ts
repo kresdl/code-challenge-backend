@@ -56,11 +56,10 @@ const notify = async (user: User, auth: string) => {
       const description = "Description: " + msg.description;
       return [msg.title, priority, createDate, exactLocation, description].join("\n");
     });
-
     if (!formattedMessages.length) return;
 
     twilioClient.messages.create({
-      body: "\n" + formattedMessages.join("\n\n"),
+      body: formattedMessages.join("\n\n"),
       from: sendingNumber,
       to: phoneNumber,
     });
