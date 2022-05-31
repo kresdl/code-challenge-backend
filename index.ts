@@ -1,5 +1,5 @@
 import "./config";
-import routes from "./routes";
+import routes from "./router";
 import express from "express";
 import { notifyAllUsers } from "./notification";
 
