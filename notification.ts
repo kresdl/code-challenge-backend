@@ -82,5 +82,3 @@ export const notifyUser = (auth: string) => {
 export const notifyAllUsers = () => {
   users.forEach(notify);
 };
-
-export default users;
