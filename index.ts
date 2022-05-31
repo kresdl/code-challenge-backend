@@ -1,7 +1,7 @@
 import "./config";
 import routes from "./routes";
 import express from "express";
-import { notifyAllUsers } from "./users";
+import { notifyAllUsers } from "./notification";
 
 const app = express();
 
