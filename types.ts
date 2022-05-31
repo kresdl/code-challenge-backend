@@ -6,6 +6,7 @@ export interface Message {
   title: string;
   exactlocation: string;
   description: string;
+  category: string;
 }
 
 export interface SRTrafficMessages {

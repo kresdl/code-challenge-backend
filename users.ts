@@ -54,7 +54,8 @@ const notify = async (user: User, auth: string) => {
       const createDate = "Time: " + msg.createddate;
       const exactLocation = "Location: " + msg.exactlocation;
       const description = "Description: " + msg.description;
-      return [msg.title, priority, createDate, exactLocation, description].join("\n");
+      const category = "Category: " + msg.category;
+      return [msg.title, priority, createDate, exactLocation, description, category].join("\n");
     });
     if (!formattedMessages.length) return;
 
