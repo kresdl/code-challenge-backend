@@ -6,7 +6,6 @@ const FAKE_ID = "fake-auth";
 const FAKE_LATITUDE = 14.4343;
 const FAKE_LONGITUDE = 44.2543;
 
-jest.mock("../../utils");
 jest.mock("../../models");
 
 const mockUpdatePosition = (update as jest.Mock).mockResolvedValue({});
