@@ -5,8 +5,9 @@
   "description": "Coding challenge ========================",
   "main": "index.js",
   "scripts": {
+    "start": "cp .env.prod .env && node --experimental-specifier-resolution=node build/index.js",
     "tsc": "tsc -p . -w",
-    "start": "cp .env.local .env && nodemon --experimental-specifier-resolution=node build/index.js",
+    "dev": "cp .env.local .env && nodemon --experimental-specifier-resolution=node build/index.js",
     "test": "cp .env.test .env && jest"
   },
   "repository": {

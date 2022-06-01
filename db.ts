@@ -1,10 +1,18 @@
 import mysql, { QueryOptions } from "mysql";
 
+const dbUser = process.env.DB_USER;
+const dbPassword = process.env.DB_PASSWORD;
+const database = process.env.DATABASE;
+
+if (!dbUser) throw Error("DB_USER not set");
+if (!dbPassword) throw Error("DB_PASSWORD not set");
+if (!database) throw Error("DATABASE not set");
+
 const pool = mysql.createPool({
-  database: "traffic",
+  database,
   host: "localhost",
-  user: "root",
-  password: "mysql",
+  user: dbUser,
+  password: dbPassword,
 });
 
 export const query = (options: string | QueryOptions, values?: any) =>
