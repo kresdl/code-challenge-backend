@@ -1,16 +1,15 @@
 import "../../config";
 import { subscribe } from "../";
-import { getAuth, formatDate } from "../../utils";
+import { formatDate } from "../../utils";
 import { register } from "../../models";
 
 const FAKE_TIME = "2020-01-01";
-const FAKE_AUTH = "fake-auth";
+const FAKE_ID = "fake-id";
 const FAKE_PHONE = "+999999";
 
 jest.mock("../../utils");
 jest.mock("../../models");
 
-(getAuth as jest.Mock).mockReturnValue(FAKE_AUTH);
 (formatDate as jest.Mock).mockReturnValue(FAKE_TIME);
 
 const mockRegister = (register as jest.Mock).mockResolvedValue({});
@@ -20,6 +19,7 @@ const mockSend = jest.fn();
 const mockStatus = jest.fn().mockReturnThis();
 
 const response = {
+  locals: { userId: FAKE_ID },
   send: mockSend,
   status: mockStatus,
   sendStatus: mockSendStatus,
@@ -38,7 +38,7 @@ describe("'subscribe' responds correctly", () => {
     await subscribe(request, response, mockNext);
 
     expect(mockRegister).toHaveBeenCalledWith({
-      auth: FAKE_AUTH,
+      id: FAKE_ID,
       phoneNumber: FAKE_PHONE,
       lastUpdateAt: FAKE_TIME,
     });

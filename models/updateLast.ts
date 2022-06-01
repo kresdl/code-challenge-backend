@@ -5,7 +5,7 @@ interface Last {
   lastArea: string;
 }
 
-const updatePosition = (auth: string, { lastUpdateAt, lastArea }: Last) =>
+const updatePosition = (id: string, { lastUpdateAt, lastArea }: Last) =>
   query(
     `
       UPDATE users 
@@ -13,9 +13,9 @@ const updatePosition = (auth: string, { lastUpdateAt, lastArea }: Last) =>
       last_update_at = ?,
       last_area = ?
       WHERE
-      auth = ?
+      id = ?
     `,
-    [lastUpdateAt, lastArea, auth]
+    [lastUpdateAt, lastArea, id]
   );
 
 export default updatePosition;

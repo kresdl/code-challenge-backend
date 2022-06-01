@@ -1,22 +1,22 @@
 import { query } from "../db";
 
 interface Register {
-  auth: string;
+  id: string;
   phoneNumber: string;
   lastUpdateAt: string;
 }
 
-const register = ({ auth, phoneNumber, lastUpdateAt }: Register) =>
+const register = ({ id, phoneNumber, lastUpdateAt }: Register) =>
   query(
     `
       INSERT INTO 
       users
       SET
-      auth = ?,
+      id = ?,
       phone_number = ?,
       last_update_at = ?
     `,
-    [auth, phoneNumber, lastUpdateAt]
+    [id, phoneNumber, lastUpdateAt]
   );
 
 export default register;

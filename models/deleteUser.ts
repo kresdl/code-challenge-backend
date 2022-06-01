@@ -1,13 +1,13 @@
 import { query } from "../db";
 
-const deleteUser = (auth: string) =>
+const deleteUser = (id: string) =>
   query(
     `
       DELETE FROM users 
       WHERE
-      auth = ?
+      id = ?
     `,
-    [auth]
+    [id]
   );
 
 export default deleteUser;

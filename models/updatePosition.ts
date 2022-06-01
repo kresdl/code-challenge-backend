@@ -5,7 +5,7 @@ interface Position {
   longitude: number;
 }
 
-const updatePosition = (auth: string, { latitude, longitude }: Position) =>
+const updatePosition = (id: string, { latitude, longitude }: Position) =>
   query(
     `
       UPDATE users 
@@ -13,9 +13,9 @@ const updatePosition = (auth: string, { latitude, longitude }: Position) =>
       latitude = ?,
       longitude = ?
       WHERE
-      auth = ?
+      id = ?
     `,
-    [latitude, longitude, auth]
+    [latitude, longitude, id]
   );
 
 export default updatePosition;

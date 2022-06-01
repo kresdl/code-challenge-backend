@@ -1,16 +1,13 @@
 import "../../config";
 import { updatePosition } from "../";
-import { getAuth } from "../../utils";
 import { updatePosition as update } from "../../models";
 
-const FAKE_AUTH = "fake-auth";
+const FAKE_ID = "fake-auth";
 const FAKE_LATITUDE = 14.4343;
 const FAKE_LONGITUDE = 44.2543;
 
 jest.mock("../../utils");
 jest.mock("../../models");
-
-(getAuth as jest.Mock).mockReturnValue(FAKE_AUTH);
 
 const mockUpdatePosition = (update as jest.Mock).mockResolvedValue({});
 const mockNext = jest.fn();
@@ -19,6 +16,7 @@ const mockSend = jest.fn();
 const mockStatus = jest.fn().mockReturnThis();
 
 const response = {
+  locals: { userId: FAKE_ID },
   send: mockSend,
   status: mockStatus,
   sendStatus: mockSendStatus,
@@ -39,7 +37,7 @@ describe("'updatePosition' responds correctly", () => {
 
     await updatePosition(request, response, mockNext);
 
-    expect(mockUpdatePosition).toHaveBeenCalledWith(FAKE_AUTH, {
+    expect(mockUpdatePosition).toHaveBeenCalledWith(FAKE_ID, {
       latitude: FAKE_LATITUDE,
       longitude: FAKE_LONGITUDE,
     });

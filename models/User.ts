@@ -1,5 +1,5 @@
 export interface UserDB {
-  auth: string;
+  id: string;
   phone_number: string;
   last_update_at: string;
   last_area?: string;
@@ -8,7 +8,7 @@ export interface UserDB {
 }
 
 export interface User {
-  auth: string;
+  id: string;
   phoneNumber: string;
   lastUpdateAt: string;
   lastArea?: string;

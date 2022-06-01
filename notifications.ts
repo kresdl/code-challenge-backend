@@ -21,7 +21,7 @@ const axiosClient = axios.create({
 const twilioClient = twilio(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN);
 
 const notify = async (user: User) => {
-  const { auth, phoneNumber, latitude, longitude, lastArea } = user;
+  const { id, phoneNumber, latitude, longitude, lastArea } = user;
   if (!latitude || !longitude) return;
 
   try {
@@ -56,6 +56,7 @@ const notify = async (user: User) => {
       return [msg.title, priority, createDate, exactLocation, description, category].join("\n");
     });
 
+    console.log(formattedMessages);
     if (!formattedMessages.length) return;
 
     twilioClient.messages.create({
@@ -63,7 +64,7 @@ const notify = async (user: User) => {
       from: TWILIO_NUMBER,
       to: phoneNumber,
     });
-    updateLast(auth, {
+    updateLast(id, {
       lastUpdateAt: thisUpdateAt,
       lastArea: area,
     });
@@ -72,8 +73,8 @@ const notify = async (user: User) => {
   }
 };
 
-export const notifyUser = async (auth: string) => {
-  const user = await getUser(auth);
+export const notifyUser = async (id: string) => {
+  const user = await getUser(id);
   if (user) notify(user);
 };
 

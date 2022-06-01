@@ -5,7 +5,7 @@ const getUsers = async (): Promise<User[]> => {
   const result: UserDB[] = await query(
     `
       SELECT
-      auth, phone_number, last_update_at, last_area, latitude, longitude
+      id, phone_number, last_update_at, last_area, latitude, longitude
       FROM 
       users
     `
