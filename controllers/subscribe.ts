@@ -2,17 +2,22 @@ import { RequestHandler } from "express";
 import { register } from "../models";
 import { formatDate, getAuth } from "../utils";
 
+const validateInput = (body: any) => {
+  return /\+\d+/.test(body.phoneNumber);
+};
+
 const subscribe: RequestHandler = async (req, res) => {
   const auth = getAuth(req);
-  const { phoneNumber } = req.body;
-  if (!/\+\d+/.test(phoneNumber)) return res.sendStatus(400);
+  const { body } = req;
+  if (!validateInput(body)) return res.status(400).send("Invalid phone number format");
+  const { phoneNumber } = body;
   const lastUpdateAt = formatDate(new Date());
   try {
     await register({ auth, phoneNumber, lastUpdateAt });
     res.sendStatus(200);
   } catch (error) {
     console.error(error);
-    res.sendStatus(500);
+    res.status(500).send(error);
   }
 };
 

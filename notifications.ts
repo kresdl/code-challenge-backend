@@ -6,30 +6,26 @@ import { getUser, updateLast } from "./models";
 import getUsers from "./models/getUsers";
 import { User } from "./models/User";
 
-const accountSid = process.env.TWILIO_ACCOUNT_SID;
-const authToken = process.env.TWILIO_AUTH_TOKEN;
-const sendingNumber = process.env.TWILIO_NUMBER;
-const srTrafficAreasAPI = process.env.SR_TRAFFIC_AREAS_API;
-const srTrafficMessagesAPI = process.env.SR_TRAFFIC_MESSAGES_API;
-
-if (!accountSid) throw Error("TWILIO_ACCOUNT_SID not set");
-if (!authToken) throw Error("TWILIO_AUTH_TOKEN not set");
-if (!sendingNumber) throw Error("TWILIO_NUMBER not set");
-if (!srTrafficAreasAPI) throw Error("SR_TRAFFIC_AREAS_API not set");
-if (!srTrafficMessagesAPI) throw Error("SR_TRAFFIC_MESSAGES_API not set");
+const { TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, TWILIO_NUMBER, SR_TRAFFIC_AREAS_API, SR_TRAFFIC_MESSAGES_API } =
+  process.env;
+if (!TWILIO_ACCOUNT_SID) throw Error("TWILIO_ACCOUNT_SID not set");
+if (!TWILIO_AUTH_TOKEN) throw Error("TWILIO_AUTH_TOKEN not set");
+if (!TWILIO_NUMBER) throw Error("TWILIO_NUMBER not set");
+if (!SR_TRAFFIC_AREAS_API) throw Error("SR_TRAFFIC_AREAS_API not set");
+if (!SR_TRAFFIC_MESSAGES_API) throw Error("SR_TRAFFIC_MESSAGES_API not set");
 
 const axiosClient = axios.create({
   headers: { "Content-Type": "application/x-www-form-urlencoded" },
 });
 
-const twilioClient = twilio(accountSid, authToken);
+const twilioClient = twilio(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN);
 
 const notify = async (user: User) => {
   const { auth, phoneNumber, latitude, longitude, lastArea } = user;
   if (!latitude || !longitude) return;
 
   try {
-    const { data: areasXML } = await axiosClient.get(srTrafficAreasAPI, {
+    const { data: areasXML } = await axiosClient.get(SR_TRAFFIC_AREAS_API, {
       params: { latitude, longitude },
     });
 
@@ -42,7 +38,7 @@ const notify = async (user: User) => {
     const lastUpdateAt = lastArea !== area ? today : user.lastUpdateAt;
     const thisUpdateAt = now;
 
-    const { data: messagesXML } = await axiosClient.get(srTrafficMessagesAPI, {
+    const { data: messagesXML } = await axiosClient.get(SR_TRAFFIC_MESSAGES_API, {
       params: {
         trafficareaname: area,
         date: today,
@@ -64,7 +60,7 @@ const notify = async (user: User) => {
 
     twilioClient.messages.create({
       body: formattedMessages.join("\n\n"),
-      from: sendingNumber,
+      from: TWILIO_NUMBER,
       to: phoneNumber,
     });
     updateLast(auth, {

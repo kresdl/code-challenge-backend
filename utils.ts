@@ -17,10 +17,9 @@ export const compareMessageByDate =
 
 export const getAuth = (req: Request) => req.headers.authorization?.match(/Bearer\s(.+)/)?.[1] ?? "";
 
-const zeroPad = (value: number) => value.toString().replace(/^(\d)$/, "0$1");
+const zeroPad = (value: number) => `0${value}`.slice(-2);
 
 export const formatDate = (date: Date) => {
-  console.log(date);
   const year = date.getFullYear().toString();
   const month = zeroPad(date.getMonth() + 1);
   const day = zeroPad(date.getDate());

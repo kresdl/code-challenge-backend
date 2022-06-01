@@ -12,11 +12,18 @@ jest.mock("../../models");
 
 (getAuth as jest.Mock).mockReturnValue(FAKE_AUTH);
 (formatDate as jest.Mock).mockReturnValue(FAKE_TIME);
-const mockRegister = (register as jest.Mock).mockResolvedValue({});
 
+const mockRegister = (register as jest.Mock).mockResolvedValue({});
 const mockNext = jest.fn();
+const mockSendStatus = jest.fn();
 const mockSend = jest.fn();
-const response = { sendStatus: mockSend } as any;
+const mockStatus = jest.fn().mockReturnThis();
+
+const response = {
+  send: mockSend,
+  status: mockStatus,
+  sendStatus: mockSendStatus,
+} as any;
 
 describe("'subscribe' responds correctly", () => {
   beforeEach(() => {
@@ -35,17 +42,18 @@ describe("'subscribe' responds correctly", () => {
       phoneNumber: FAKE_PHONE,
       lastUpdateAt: FAKE_TIME,
     });
-    expect(response.sendStatus).toHaveBeenCalledWith(200);
+    expect(mockSendStatus).toHaveBeenCalledWith(200);
   });
 
-  test("returns 400 on failed request", () => {
+  test("returns 400 on failed request", async () => {
     const request = {
       body: { phoneNumber: "999999" },
     } as any;
 
-    subscribe(request, response, mockNext);
+    await subscribe(request, response, mockNext);
 
     expect(mockRegister).not.toHaveBeenCalled();
-    expect(response.sendStatus).toHaveBeenCalledWith(400);
+    expect(mockStatus).toHaveBeenCalledWith(400);
+    expect(mockSend).toHaveBeenCalled();
   });
 });

@@ -12,15 +12,8 @@ const getUsers = async (): Promise<User[]> => {
   );
 
   return result.map(user => {
-    const {
-      auth,
-      phone_number: phoneNumber,
-      last_update_at: lastUpdateAt,
-      last_area: lastArea,
-      latitude,
-      longitude,
-    } = user;
-    return { auth, phoneNumber, lastUpdateAt, lastArea, latitude, longitude };
+    const { phone_number: phoneNumber, last_update_at: lastUpdateAt, last_area: lastArea, ...rest } = user;
+    return { phoneNumber, lastUpdateAt, lastArea, ...rest };
   });
 };
 
