@@ -30,15 +30,3 @@ export interface SRTrafficAreas {
     ];
   };
 }
-
-interface Position {
-  latitude: number;
-  longitude: number;
-}
-
-export interface User {
-  phoneNumber: string;
-  position?: Position;
-  lastUpdateAt: string;
-  lastArea?: string;
-}

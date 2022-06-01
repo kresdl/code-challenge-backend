@@ -1,10 +1,10 @@
 import { RequestHandler } from "express";
-import users from "../users";
+import { deleteUser } from "../models";
 import { getAuth } from "../utils";
 
 const signOut: RequestHandler = (req, res) => {
   const auth = getAuth(req);
-  users.delete(auth);
+  deleteUser(auth);
   res.sendStatus(200);
 };
 

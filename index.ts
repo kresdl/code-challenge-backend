@@ -1,7 +1,7 @@
 import "./config";
-import routes from "./router";
+import router from "./router";
 import express from "express";
-import { notifyAllUsers } from "./notification";
+import { notifyAllUsers } from "./notifications";
 
 const app = express();
 
@@ -11,9 +11,9 @@ const port = ~~PORT;
 
 app.disable("x-powered-by");
 
-app.use(routes);
+app.use(router);
 
-app.listen(port, "0.0.0.0", () => {
+app.listen(port, "0.0.0.0", async () => {
   console.log(`Listening on port ${port}...`);
   setInterval(notifyAllUsers, 30000);
 });

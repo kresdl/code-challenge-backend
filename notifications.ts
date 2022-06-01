@@ -1,8 +1,10 @@
 import axios from "axios";
-import { SRTrafficMessages, SRTrafficAreas, User } from "./types";
-import { compareMessageByDate, parseXML } from "./utils";
+import { SRTrafficMessages, SRTrafficAreas } from "./types";
+import { compareMessageByDate, formatDate, formatDateTime, parseXML } from "./utils";
 import twilio from "twilio";
-import users from "./users";
+import { getUser, updateLast } from "./models";
+import getUsers from "./models/getUsers";
+import { User } from "./models/User";
 
 const accountSid = process.env.TWILIO_ACCOUNT_SID;
 const authToken = process.env.TWILIO_AUTH_TOKEN;
@@ -22,19 +24,19 @@ const axiosClient = axios.create({
 
 const twilioClient = twilio(accountSid, authToken);
 
-const notify = async (user: User, auth: string) => {
-  const { position, phoneNumber, lastArea } = user;
-  if (!position) return;
+const notify = async (user: User) => {
+  const { auth, phoneNumber, latitude, longitude, lastArea } = user;
+  if (!latitude || !longitude) return;
 
   try {
     const { data: areasXML } = await axiosClient.get(srTrafficAreasAPI, {
-      params: position,
+      params: { latitude, longitude },
     });
 
     const areas = await parseXML<SRTrafficAreas>(areasXML);
     const area = areas.sr.area[0].$.name;
-    const today = new Date().toDateString();
-    const now = new Date().toString();
+    const today = formatDate(new Date());
+    const now = formatDateTime(new Date());
 
     // If user entered a new area, get all messages for the day
     const lastUpdateAt = lastArea !== area ? today : user.lastUpdateAt;
@@ -57,6 +59,7 @@ const notify = async (user: User, auth: string) => {
       const category = "Category: " + msg.category;
       return [msg.title, priority, createDate, exactLocation, description, category].join("\n");
     });
+
     if (!formattedMessages.length) return;
 
     twilioClient.messages.create({
@@ -64,8 +67,7 @@ const notify = async (user: User, auth: string) => {
       from: sendingNumber,
       to: phoneNumber,
     });
-    users.set(auth, {
-      ...user,
+    updateLast(auth, {
       lastUpdateAt: thisUpdateAt,
       lastArea: area,
     });
@@ -74,11 +76,12 @@ const notify = async (user: User, auth: string) => {
   }
 };
 
-export const notifyUser = (auth: string) => {
-  const user = users.get(auth);
-  if (user) notify(user, auth);
+export const notifyUser = async (auth: string) => {
+  const user = await getUser(auth);
+  if (user) notify(user);
 };
 
-export const notifyAllUsers = () => {
+export const notifyAllUsers = async () => {
+  const users = await getUsers();
   users.forEach(notify);
 };

@@ -1,30 +1,18 @@
-import "../config";
+import "../../config";
 import { subscribe } from "../";
-import users from "../../users";
-import { getAuth } from "../../utils";
+import { getAuth, formatDate } from "../../utils";
+import { register } from "../../models";
 
-const fakeDate = new Date("2020-01-01");
-
+const FAKE_TIME = "2020-01-01";
 const FAKE_AUTH = "fake-auth";
 const FAKE_PHONE = "+999999";
-const FAKE_DATE = fakeDate.toDateString();
 
-jest.useFakeTimers();
-jest.setSystemTime(fakeDate);
-
-jest.mock("./users");
-jest.mock("./utils");
-
-const mockSetUser = jest.fn();
-const mockGetUser = jest.fn((_auth: string) => ({
-  phoneNumber: FAKE_PHONE,
-  lastUpdateAt: FAKE_DATE,
-}));
-
-users.get = mockGetUser;
-users.set = mockSetUser;
+jest.mock("../../utils");
+jest.mock("../../models");
 
 (getAuth as jest.Mock).mockReturnValue(FAKE_AUTH);
+(formatDate as jest.Mock).mockReturnValue(FAKE_TIME);
+const mockRegister = (register as jest.Mock).mockResolvedValue({});
 
 const mockNext = jest.fn();
 const mockSend = jest.fn();
@@ -35,16 +23,17 @@ describe("'subscribe' responds correctly", () => {
     jest.clearAllMocks();
   });
 
-  test("updates user and returns 200 on successful request", () => {
+  test("updates user and returns 200 on successful request", async () => {
     const request = {
       body: { phoneNumber: FAKE_PHONE },
     } as any;
 
-    subscribe(request, response, mockNext);
+    await subscribe(request, response, mockNext);
 
-    expect(mockSetUser).toHaveBeenCalledWith(FAKE_AUTH, {
+    expect(mockRegister).toHaveBeenCalledWith({
+      auth: FAKE_AUTH,
       phoneNumber: FAKE_PHONE,
-      lastUpdateAt: FAKE_DATE,
+      lastUpdateAt: FAKE_TIME,
     });
     expect(response.sendStatus).toHaveBeenCalledWith(200);
   });
@@ -56,7 +45,7 @@ describe("'subscribe' responds correctly", () => {
 
     subscribe(request, response, mockNext);
 
-    expect(mockSetUser).not.toHaveBeenCalled();
+    expect(mockRegister).not.toHaveBeenCalled();
     expect(response.sendStatus).toHaveBeenCalledWith(400);
   });
 });

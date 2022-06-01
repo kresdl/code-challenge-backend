@@ -1,32 +1,18 @@
-import "../config";
+import "../../config";
 import { updatePosition } from "../";
-import users from "../../users";
 import { getAuth } from "../../utils";
-
-const fakeDate = new Date("2020-01-01");
+import { updatePosition as update } from "../../models";
 
 const FAKE_AUTH = "fake-auth";
-const FAKE_PHONE = "+999999";
 const FAKE_LATITUDE = "14.4343";
 const FAKE_LONGITUDE = "44.2543";
-const FAKE_DATE = fakeDate.toDateString();
 
-jest.useFakeTimers();
-jest.setSystemTime(fakeDate);
-
-jest.mock("./users");
-jest.mock("./utils");
-
-const mockSetUser = jest.fn();
-const mockGetUser = jest.fn((_auth: string) => ({
-  phoneNumber: FAKE_PHONE,
-  lastUpdateAt: FAKE_DATE,
-}));
-
-users.get = mockGetUser;
-users.set = mockSetUser;
+jest.mock("../../utils");
+jest.mock("../../models");
 
 (getAuth as jest.Mock).mockReturnValue(FAKE_AUTH);
+
+const mockUpdatePosition = (update as jest.Mock).mockResolvedValue({});
 
 const mockNext = jest.fn();
 const mockSend = jest.fn();
@@ -37,7 +23,7 @@ describe("'updatePosition' responds correctly", () => {
     jest.clearAllMocks();
   });
 
-  test("updates user and returns 200 on successful request", () => {
+  test("updates user and returns 200 on successful request", async () => {
     const request = {
       body: {
         latitude: FAKE_LATITUDE,
@@ -45,20 +31,16 @@ describe("'updatePosition' responds correctly", () => {
       },
     } as any;
 
-    updatePosition(request, response, mockNext);
+    await updatePosition(request, response, mockNext);
 
-    expect(mockSetUser).toHaveBeenCalledWith(FAKE_AUTH, {
-      phoneNumber: FAKE_PHONE,
-      lastUpdateAt: FAKE_DATE,
-      position: {
-        latitude: FAKE_LATITUDE,
-        longitude: FAKE_LONGITUDE,
-      },
+    expect(mockUpdatePosition).toHaveBeenCalledWith(FAKE_AUTH, {
+      latitude: FAKE_LATITUDE,
+      longitude: FAKE_LONGITUDE,
     });
     expect(response.sendStatus).toHaveBeenCalledWith(200);
   });
 
-  test("returns 400 on failed request", () => {
+  test("returns 400 on failed request", async () => {
     const request = {
       body: {
         latitude: "",
@@ -66,9 +48,9 @@ describe("'updatePosition' responds correctly", () => {
       },
     } as any;
 
-    updatePosition(request, response, mockNext);
+    await updatePosition(request, response, mockNext);
 
-    expect(mockSetUser).not.toHaveBeenCalled();
+    expect(mockUpdatePosition).not.toHaveBeenCalled();
     expect(response.sendStatus).toHaveBeenCalledWith(400);
   });
 });

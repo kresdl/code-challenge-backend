@@ -6,7 +6,7 @@
   "main": "index.js",
   "scripts": {
     "tsc": "tsc -p . -w",
-    "start": "cp .env.local .env && node --experimental-specifier-resolution=node build/index.js",
+    "start": "cp .env.local .env && nodemon --experimental-specifier-resolution=node build/index.js",
     "test": "cp .env.test .env && jest"
   },
   "repository": {

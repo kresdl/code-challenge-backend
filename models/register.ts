@@ -1,20 +1,22 @@
 import { query } from "../db";
 
-interface Arg {
+interface Register {
   auth: string;
   phoneNumber: string;
   lastUpdateAt: string;
 }
 
-const register = async ({ auth, phoneNumber, lastUpdateAt }: Arg) =>
+const register = ({ auth, phoneNumber, lastUpdateAt }: Register) =>
   query(
     `
-      INSERT INTO users
-      SET auth=?,
-      SET phone_number=?
-      SET last_update_at=?
+      INSERT INTO 
+      users
+      SET
+      auth = ?,
+      phone_number = ?,
+      last_update_at = ?
     `,
     [auth, phoneNumber, lastUpdateAt]
-  ).catch(console.error);
+  );
 
 export default register;

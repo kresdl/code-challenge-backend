@@ -16,3 +16,21 @@ export const compareMessageByDate =
     new Date(createddate) > new Date(date);
 
 export const getAuth = (req: Request) => req.headers.authorization?.match(/Bearer\s(.+)/)?.[1] ?? "";
+
+const zeroPad = (value: number) => value.toString().replace(/^(\d)$/, "0$1");
+
+export const formatDate = (date: Date) => {
+  console.log(date);
+  const year = date.getFullYear().toString();
+  const month = zeroPad(date.getMonth() + 1);
+  const day = zeroPad(date.getDate());
+  return `${year}-${month}-${day}`;
+};
+
+export const formatDateTime = (date: Date) => {
+  const datePart = formatDate(date);
+  const hours = zeroPad(date.getHours());
+  const minutes = zeroPad(date.getMinutes());
+  const seconds = zeroPad(date.getSeconds());
+  return `${datePart} ${hours}:${minutes}:${seconds}`;
+};
