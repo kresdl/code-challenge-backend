@@ -11,6 +11,7 @@ const pool = mysql.createPool({
   host: DB_HOST,
   user: DB_USER,
   password: DB_PASSWORD,
+  timezone: "2",
 });
 
 export const query = (options: string | QueryOptions, values?: any) =>
