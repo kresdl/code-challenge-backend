@@ -7,7 +7,7 @@ const { PORT, HOST } = process.env;
 if (!PORT) throw Error("PORT not set");
 if (!HOST) throw Error("HOST not set");
 
-const UPDATE_INTERVAL = 30000;
+const UPDATE_INTERVAL = 10000;
 
 const app = express();
 

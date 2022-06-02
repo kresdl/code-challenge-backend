@@ -3,13 +3,13 @@ import { query } from "../db";
 interface Register {
   id: string;
   phoneNumber: string;
-  lastUpdateAt: Date;
+  lastUpdateAt: string;
 }
 
 const register = ({ id, phoneNumber, lastUpdateAt }: Register) =>
   query(
     `
-      INSERT INTO 
+      REPLACE INTO 
       users
       SET
       id = ?,

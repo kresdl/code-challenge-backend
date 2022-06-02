@@ -1,6 +1,7 @@
 import xml2js from "xml2js";
 import { Message } from "./types";
 import { Request } from "express";
+import dayjs from "dayjs";
 
 export const parseXML = <T>(xml: string) =>
   new Promise<T>((resolve, reject) => {
@@ -11,12 +12,9 @@ export const parseXML = <T>(xml: string) =>
   });
 
 export const compareMessageByDate =
-  (date: Date) =>
-  ({ createddate }: Message) =>
-    new Date(createddate) > date;
+  (date: dayjs.Dayjs) =>
+  ({ createddate }: Message) => {
+    return date.isBefore(createddate);
+  };
 
 export const getAuth = (req: Request) => req.headers.authorization?.match(/Bearer\s(.+)/)?.[1] ?? "";
-
-export const stripTime = (date: Date) => {
-  return new Date(date.toDateString());
-};

@@ -1,10 +1,11 @@
 import axios from "axios";
 import { SRTrafficMessages, SRTrafficAreas } from "./types";
-import { compareMessageByDate, parseXML, stripTime } from "./utils";
+import { compareMessageByDate, parseXML } from "./utils";
 import twilio from "twilio";
 import { getUser, updateLast } from "./models";
 import getUsers from "./models/getUsers";
 import { User } from "./models/User";
+import dayjs from "dayjs";
 
 const { TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, TWILIO_NUMBER, SR_TRAFFIC_AREAS_API, SR_TRAFFIC_MESSAGES_API } =
   process.env;
@@ -31,17 +32,16 @@ const notify = async (user: User) => {
 
     const areas = await parseXML<SRTrafficAreas>(areasXML);
     const area = areas.sr.area[0].$.name;
-    const today = stripTime(new Date());
-    const now = new Date();
+    const now = dayjs();
 
-    // If user entered a new area, get all messages for the day
-    const lastUpdateAt = lastArea !== area ? today : new Date(user.lastUpdateAt);
-    const thisUpdateAt = now;
+    // If user entered a new area, get all messages for the last 24 hours
+    const lastUpdateAt = lastArea !== area ? now.subtract(1, "day") : dayjs(user.lastUpdateAt);
+    const thisUpdateAt = now.format("YYYY-MM-DD HH:mm:ss");
 
     const { data: messagesXML } = await axiosClient.get(SR_TRAFFIC_MESSAGES_API, {
       params: {
         trafficareaname: area,
-        date: today,
+        date: dayjs(lastUpdateAt).format("YYYY-MM-DD"),
       },
     });
 
