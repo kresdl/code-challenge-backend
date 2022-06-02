@@ -1,7 +1,7 @@
 # code-challenge-backend
 
 ### Traffic notification backend
-#### API Hosted at https://w36.dev/traffic
+#### Hosted at https://w36.dev/traffic
 
 Development:
 
