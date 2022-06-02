@@ -1,16 +1,16 @@
 import "../../config";
 import { subscribe } from "../";
-import { formatDate } from "../../utils";
+import { stripTime } from "../../utils";
 import { register } from "../../models";
 
-const FAKE_TIME = "2020-01-01";
+const FAKE_TIME = new Date("2020-01-01 00:00:00");
 const FAKE_ID = "fake-id";
 const FAKE_PHONE = "+999999";
 
 jest.mock("../../utils");
 jest.mock("../../models");
 
-(formatDate as jest.Mock).mockReturnValue(FAKE_TIME);
+(stripTime as jest.Mock).mockReturnValue(FAKE_TIME);
 
 const mockRegister = (register as jest.Mock).mockResolvedValue({});
 const mockNext = jest.fn();

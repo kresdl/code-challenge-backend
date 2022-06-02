@@ -1,6 +1,6 @@
 import { RequestHandler } from "express";
 import { register } from "../models";
-import { formatDate } from "../utils";
+import { stripTime } from "../utils";
 
 const validateInput = (body: any) => {
   return /\+\d+/.test(body.phoneNumber);
@@ -10,7 +10,7 @@ const subscribe: RequestHandler = async (req, res) => {
   const { body } = req;
   if (!validateInput(body)) return res.status(400).send("Invalid phone number format");
   const { phoneNumber } = body;
-  const lastUpdateAt = formatDate(new Date());
+  const lastUpdateAt = stripTime(new Date());
   try {
     await register({
       id: res.locals.userId,

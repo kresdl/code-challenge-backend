@@ -11,25 +11,12 @@ export const parseXML = <T>(xml: string) =>
   });
 
 export const compareMessageByDate =
-  (date: string) =>
+  (date: Date) =>
   ({ createddate }: Message) =>
-    new Date(createddate) > new Date(date);
+    new Date(createddate) > date;
 
 export const getAuth = (req: Request) => req.headers.authorization?.match(/Bearer\s(.+)/)?.[1] ?? "";
 
-const zeroPad = (value: number) => `0${value}`.slice(-2);
-
-export const formatDate = (date: Date) => {
-  const year = date.getFullYear().toString();
-  const month = zeroPad(date.getMonth() + 1);
-  const day = zeroPad(date.getDate());
-  return `${year}-${month}-${day}`;
-};
-
-export const formatDateTime = (date: Date) => {
-  const datePart = formatDate(date);
-  const hours = zeroPad(date.getHours());
-  const minutes = zeroPad(date.getMinutes());
-  const seconds = zeroPad(date.getSeconds());
-  return `${datePart} ${hours}:${minutes}:${seconds}`;
+export const stripTime = (date: Date) => {
+  return new Date(date.toDateString());
 };

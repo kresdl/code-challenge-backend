@@ -1,7 +1,7 @@
 import { query } from "../db";
 
 interface Last {
-  lastUpdateAt: string;
+  lastUpdateAt: Date;
   lastArea: string;
 }
 

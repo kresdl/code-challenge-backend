@@ -1,6 +1,6 @@
 import axios from "axios";
 import { SRTrafficMessages, SRTrafficAreas } from "./types";
-import { compareMessageByDate, formatDate, formatDateTime, parseXML } from "./utils";
+import { compareMessageByDate, parseXML, stripTime } from "./utils";
 import twilio from "twilio";
 import { getUser, updateLast } from "./models";
 import getUsers from "./models/getUsers";
@@ -31,11 +31,11 @@ const notify = async (user: User) => {
 
     const areas = await parseXML<SRTrafficAreas>(areasXML);
     const area = areas.sr.area[0].$.name;
-    const today = formatDate(new Date());
-    const now = formatDateTime(new Date());
+    const today = stripTime(new Date());
+    const now = new Date();
 
     // If user entered a new area, get all messages for the day
-    const lastUpdateAt = lastArea !== area ? today : user.lastUpdateAt;
+    const lastUpdateAt = lastArea !== area ? today : new Date(user.lastUpdateAt);
     const thisUpdateAt = now;
 
     const { data: messagesXML } = await axiosClient.get(SR_TRAFFIC_MESSAGES_API, {

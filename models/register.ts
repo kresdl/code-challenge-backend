@@ -3,7 +3,7 @@ import { query } from "../db";
 interface Register {
   id: string;
   phoneNumber: string;
-  lastUpdateAt: string;
+  lastUpdateAt: Date;
 }
 
 const register = ({ id, phoneNumber, lastUpdateAt }: Register) =>
