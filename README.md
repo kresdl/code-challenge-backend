@@ -3,7 +3,7 @@
 ### API for subscribing to traffic notifications
 #### Hosted at https://w36.dev/traffic
 
-##### Node setup:
+##### Node setup for development:
 
 `npm run tsc:watch`
 
