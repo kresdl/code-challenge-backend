@@ -56,7 +56,6 @@ const notify = async (user: User) => {
       return [msg.title, priority, createDate, exactLocation, description, category].join("\n");
     });
 
-    console.log(formattedMessages);
     if (!formattedMessages.length) return;
 
     twilioClient.messages.create({
