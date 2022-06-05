@@ -1,16 +1,16 @@
 import mysql, { QueryOptions } from "mysql";
 
-const { DB_USER, DB_PASSWORD, DATABASE, DB_HOST } = process.env;
-if (!DB_USER) throw Error("DB_USER not set");
-if (!DB_PASSWORD) throw Error("DB_PASSWORD not set");
-if (!DB_HOST) throw Error("DB_HOST not set");
-if (!DATABASE) throw Error("DATABASE not set");
+const { MYSQL_USER, MYSQL_PASSWORD, MYSQL_DATABASE, MYSQL_HOST } = process.env;
+if (!MYSQL_USER) throw Error("MYSQL_USER not set");
+if (!MYSQL_PASSWORD) throw Error("MYSQL_PASSWORD not set");
+if (!MYSQL_HOST) throw Error("MYSQL_HOST not set");
+if (!MYSQL_DATABASE) throw Error("MYSQL_DATABASE not set");
 
 const pool = mysql.createPool({
-  database: DATABASE,
-  host: DB_HOST,
-  user: DB_USER,
-  password: DB_PASSWORD,
+  database: MYSQL_DATABASE,
+  host: MYSQL_HOST,
+  user: MYSQL_USER,
+  password: MYSQL_PASSWORD,
   timezone: "2",
 });
 
