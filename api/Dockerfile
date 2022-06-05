@@ -1,6 +1,6 @@
 FROM node:14-alpine as base
 WORKDIR /app
-COPY package*.json .
+COPY package*.json ./
 EXPOSE 5000
 
 FROM base as prod
