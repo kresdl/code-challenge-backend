@@ -1,4 +1,3 @@
-import "../../config";
 import { subscribe } from "../";
 import { register } from "../../models";
 

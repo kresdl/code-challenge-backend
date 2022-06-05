@@ -1,4 +1,3 @@
-import "../../config";
 import { updatePosition } from "../";
 import { updatePosition as update } from "../../models";
 
