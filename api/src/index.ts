@@ -1,4 +1,3 @@
-import "./config";
 import router from "./router";
 import express from "express";
 import { notifyAllUsers } from "./notifications";
