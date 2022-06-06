@@ -5,11 +5,11 @@
   "description": "Coding challenge ========================",
   "main": "index.js",
   "scripts": {
-    "start": "tsc -p . && node -r dotenv/config --experimental-specifier-resolution=node build/index.js",
-    "dev": "tsc -p . && sh -c 'nodemon -r dotenv/config --experimental-specifier-resolution=node build/index.js & tsc -p . -w'",
-    "test": "jest",
-    "compose:dev": "docker-compose -f docker-compose.yml -f docker-compose.dev.yml up",
-    "compose:prod": "docker-compose -f docker-compose.yml -f docker-compose.prod.yml up"
+    "start": "node -r dotenv/config --experimental-specifier-resolution=node build/index.js",
+    "dev": "nodemon -r dotenv/config --experimental-specifier-resolution=node build/index.js",
+    "tsc": "tsc -p .",
+    "tsc:watch": "tsc -p . -w",
+    "test": "jest"
   },
   "repository": {
     "type": "git",

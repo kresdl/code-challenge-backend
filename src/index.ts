@@ -13,7 +13,19 @@ const app = express();
 app.disable("x-powered-by");
 app.use(router);
 
-app.listen(~~PORT, HOST, () => {
+const server = app.listen(~~PORT, HOST, () => {
   console.log(`Listening on port ${PORT}...`);
   setInterval(notifyAllUsers, UPDATE_INTERVAL);
 });
+
+const shutdown = () => {
+  server.close(err => {
+    if (err) {
+      console.error(err);
+      process.exit(1);
+    }
+    process.exit(0);
+  });
+};
+process.on("SIGINT", shutdown);
+process.on("SIGTERM", shutdown);
