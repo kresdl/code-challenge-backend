@@ -1,13 +1,12 @@
 # code-challenge-backend
 
-### API for subscribing to traffic notifications
-#### Hosted at https://w36.dev/traffic
+### Dockerized backend for subscribing to traffic notifications
 
-##### Node setup for development:
+#### API hosted at https://w36.dev/traffic
 
-`npm run tsc:watch`
+##### Development setup:
 
-`npm run dev`
+`npm run compose:dev`
 
 ##### Authentication:
 
