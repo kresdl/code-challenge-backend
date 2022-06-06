@@ -35,7 +35,6 @@ const notify = async (user: User) => {
     const now = dayjs();
 
     const lastUpdateAt = dayjs(user.lastUpdateAt);
-    console.log("lastUpdateAt: ", lastUpdateAt);
     const thisUpdateAt = now.format("YYYY-MM-DD HH:mm:ss");
 
     const { data: messagesXML } = await axiosClient.get(SR_TRAFFIC_MESSAGES_API, {
