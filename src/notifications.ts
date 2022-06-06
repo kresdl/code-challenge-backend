@@ -11,7 +11,7 @@ const { TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, TWILIO_NUMBER, SR_TRAFFIC_AREAS_A
   process.env;
 if (!TWILIO_ACCOUNT_SID) throw Error("TWILIO_ACCOUNT_SID not set");
 if (!TWILIO_AUTH_TOKEN) throw Error("TWILIO_AUTH_TOKEN not set");
-if (!TWILIO_NUMBER) throw Error("TWILIO_NUMBER not set");
+if (!TWILIO_NUMBER) throw Error("TWILIasdsadsaO_NUMBER not set");
 if (!SR_TRAFFIC_AREAS_API) throw Error("SR_TRAFFIC_AREAS_API not set");
 if (!SR_TRAFFIC_MESSAGES_API) throw Error("SR_TRAFFIC_MESSAGES_API not set");
 
