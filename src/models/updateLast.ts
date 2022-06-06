@@ -2,21 +2,19 @@ import { query } from "../db";
 
 interface Last {
   lastUpdateAt: string;
-  lastArea: string;
 }
 
-const updatePosition = (id: string, { lastUpdateAt, lastArea }: Last) =>
+const updatePosition = (id: string, { lastUpdateAt }: Last) =>
   query(
     `
       UPDATE
       users
       SET
-      last_update_at = ?,
-      last_area = ?
+      last_update_at = ?
       WHERE
       id = ?
     `,
-    [lastUpdateAt, lastArea, id]
+    [lastUpdateAt, id]
   );
 
 export default updatePosition;

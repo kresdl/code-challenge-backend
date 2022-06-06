@@ -5,7 +5,7 @@ const getUser = async (id: string): Promise<User | null> => {
   const result: UserDB[] = await query(
     `
       SELECT
-      id, phone_number, last_update_at, last_area, latitude, longitude
+      id, phone_number, last_update_at, latitude, longitude
       FROM 
       users
       WHERE
@@ -14,8 +14,8 @@ const getUser = async (id: string): Promise<User | null> => {
     [id]
   );
   if (!result.length) return null;
-  const { phone_number: phoneNumber, last_update_at: lastUpdateAt, last_area: lastArea, ...rest } = result[0];
-  return { phoneNumber, lastUpdateAt, lastArea, ...rest };
+  const { phone_number: phoneNumber, last_update_at: lastUpdateAt, ...rest } = result[0];
+  return { phoneNumber, lastUpdateAt, ...rest };
 };
 
 export default getUser;

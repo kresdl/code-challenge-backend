@@ -22,7 +22,7 @@ const axiosClient = axios.create({
 const twilioClient = twilio(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN);
 
 const notify = async (user: User) => {
-  const { id, phoneNumber, latitude, longitude, lastArea } = user;
+  const { id, phoneNumber, latitude, longitude } = user;
   if (!latitude || !longitude) return;
 
   try {
@@ -34,14 +34,14 @@ const notify = async (user: User) => {
     const area = areas.sr.area[0].$.name;
     const now = dayjs();
 
-    // If user entered a new area, get all messages for the last 24 hours
-    const lastUpdateAt = lastArea !== area ? now.subtract(1, "day") : dayjs(user.lastUpdateAt);
+    const lastUpdateAt = dayjs(user.lastUpdateAt);
+    console.log("lastUpdateAt: ", lastUpdateAt);
     const thisUpdateAt = now.format("YYYY-MM-DD HH:mm:ss");
 
     const { data: messagesXML } = await axiosClient.get(SR_TRAFFIC_MESSAGES_API, {
       params: {
         trafficareaname: area,
-        date: dayjs(lastUpdateAt).format("YYYY-MM-DD"),
+        date: lastUpdateAt.format("YYYY-MM-DD"),
       },
     });
 
@@ -65,7 +65,6 @@ const notify = async (user: User) => {
     });
     updateLast(id, {
       lastUpdateAt: thisUpdateAt,
-      lastArea: area,
     });
   } catch (error) {
     console.error(error);
