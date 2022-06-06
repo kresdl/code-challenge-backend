@@ -6,10 +6,9 @@ EXPOSE 5000
 FROM base as prod
 RUN npm ci
 COPY . .
-RUN npm run tsc
-CMD ["npm", "start"]
+CMD ["sh", "start-prod.sh"]
 
 FROM base as dev
 RUN npm i
 COPY . .
-CMD ["npm", "run", "dev"]
+CMD ["sh", "start-dev.sh"]

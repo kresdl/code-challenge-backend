@@ -3,7 +3,8 @@ import { query } from "../db";
 const deleteUser = (id: string) =>
   query(
     `
-      DELETE FROM users 
+      DELETE FROM
+      users
       WHERE
       id = ?
     `,

@@ -1,7 +1,10 @@
 import xml2js from "xml2js";
 import { Message } from "./types";
-import { Request } from "express";
 import dayjs from "dayjs";
+import { OAuth2Client } from "google-auth-library";
+
+const { OAUTH_CLIENT_ID } = process.env;
+if (!OAUTH_CLIENT_ID) throw Error("OAUTH_CLIENT_ID not set");
 
 export const parseXML = <T>(xml: string) =>
   new Promise<T>((resolve, reject) => {
@@ -17,4 +20,16 @@ export const compareMessageByDate =
     return date.isBefore(createddate);
   };
 
-export const getAuth = (req: Request) => req.headers.authorization?.match(/Bearer\s(.+)/)?.[1] ?? "";
+const oAuthClient = new OAuth2Client(OAUTH_CLIENT_ID);
+
+export const getUserId = async (authorizationHeader: string) => {
+  const idToken = authorizationHeader.match(/Bearer\s(.+)/)?.[1];
+  if (!idToken) throw Error("Could not find bearer token");
+  const ticket = await oAuthClient.verifyIdToken({
+    idToken,
+    audience: OAUTH_CLIENT_ID,
+  });
+  const userId = ticket.getUserId();
+  if (!userId) throw Error("Could not find user id in id token");
+  return userId;
+};

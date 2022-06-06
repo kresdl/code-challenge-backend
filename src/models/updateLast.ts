@@ -8,8 +8,9 @@ interface Last {
 const updatePosition = (id: string, { lastUpdateAt, lastArea }: Last) =>
   query(
     `
-      UPDATE users 
-      SET 
+      UPDATE
+      users
+      SET
       last_update_at = ?,
       last_area = ?
       WHERE

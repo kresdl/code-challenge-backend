@@ -5,11 +5,8 @@
   "description": "Coding challenge ========================",
   "main": "index.js",
   "scripts": {
-    "start": "node --experimental-specifier-resolution=node build/index.js",
-    "start:dev": "nodemon --experimental-specifier-resolution=node build/index.js",
-    "tsc": "tsc -p .",
-    "tsc:watch": "tsc -p . -w",
-    "dev": "npm run tsc && sh -c 'npm run tsc:watch & npm run start:dev'",
+    "start": "tsc -p . && node -r dotenv/config --experimental-specifier-resolution=node build/index.js",
+    "dev": "tsc -p . && sh -c 'nodemon -r dotenv/config --experimental-specifier-resolution=node build/index.js & tsc -p . -w'",
     "test": "jest"
   },
   "repository": {

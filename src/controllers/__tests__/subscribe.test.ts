@@ -1,14 +1,13 @@
 import { subscribe } from "../";
 import { register } from "../../models";
 
+jest.mock("../../models");
 jest.useFakeTimers();
-jest.setSystemTime(new Date("2020-10-10 00:00:00"));
+jest.setSystemTime(new Date("2020-10-10 11:11:11"));
 
-const FAKE_YESTERDAY = "2020-10-09 00:00:00";
+const FAKE_YESTERDAY = "2020-10-09 11:11:11";
 const FAKE_ID = "fake-id";
 const FAKE_PHONE = "+999999";
-
-jest.mock("../../models");
 
 const mockRegister = (register as jest.Mock).mockResolvedValue({});
 const mockNext = jest.fn();
@@ -23,7 +22,7 @@ const response = {
   sendStatus: mockSendStatus,
 } as any;
 
-describe("'subscribe' responds correctly", () => {
+describe("can subscribe", () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });

@@ -1,14 +1,17 @@
-import { RequestHandler } from "express";
 import { register } from "../models";
 import dayjs from "dayjs";
+import { AsyncRequestHandler } from "../types";
 
 const validateInput = (body: any) => {
   return /\+\d+/.test(body.phoneNumber);
 };
 
-const subscribe: RequestHandler = async (req, res) => {
+const subscribe: AsyncRequestHandler = async (req, res) => {
   const { body } = req;
-  if (!validateInput(body)) return res.status(400).send("Invalid phone number format");
+  if (!validateInput(body)) {
+    res.status(400).send("Invalid phone number format");
+    return;
+  }
   const { phoneNumber } = body;
   const lastUpdateAt = dayjs().subtract(1, "day").format("YYYY-MM-DD HH:mm:ss");
   try {

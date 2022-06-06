@@ -8,8 +8,9 @@ interface Position {
 const updatePosition = (id: string, { latitude, longitude }: Position) =>
   query(
     `
-      UPDATE users 
-      SET 
+      UPDATE
+      users
+      SET
       latitude = ?,
       longitude = ?
       WHERE

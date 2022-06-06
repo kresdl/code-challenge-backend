@@ -1,7 +1,7 @@
-import { RequestHandler } from "express";
 import { deleteUser } from "../models";
+import { AsyncRequestHandler } from "../types";
 
-const signOut: RequestHandler = async (_, res) => {
+const signOut: AsyncRequestHandler = async (_, res) => {
   try {
     await deleteUser(res.locals.userId);
     res.sendStatus(200);

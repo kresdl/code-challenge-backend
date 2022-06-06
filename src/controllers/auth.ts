@@ -1,31 +1,15 @@
-import { RequestHandler } from "express";
-import { OAuth2Client } from "google-auth-library";
-import { getAuth } from "../utils";
+import { AsyncRequestHandler } from "../types";
+import { getUserId } from "../utils";
 
-const { OAUTH_CLIENT_ID } = process.env;
-if (!OAUTH_CLIENT_ID) throw Error("OAUTH_CLIENT_ID not set");
+export const UNAUTHORIZED_MESSAGE = "Unauthorized";
 
-const oAuthClient = new OAuth2Client(OAUTH_CLIENT_ID);
-
-const getUserId = async (idToken: string) => {
-  const ticket = await oAuthClient.verifyIdToken({
-    idToken,
-    audience: OAUTH_CLIENT_ID,
-  });
-  return ticket.getUserId();
-};
-
-const auth: RequestHandler = async (req, res, next) => {
-  const denyAccess = () => res.status(401).send("Unauthorized");
-  const auth = getAuth(req);
-  if (!auth) return denyAccess();
+const auth: AsyncRequestHandler = async (req, res, next) => {
   try {
-    const userId = await getUserId(auth);
+    const userId = await getUserId(req.headers.authorization ?? "");
     res.locals.userId = userId;
     next();
   } catch (error) {
-    console.error(error);
-    denyAccess();
+    res.status(401).send(UNAUTHORIZED_MESSAGE);
   }
 };
 

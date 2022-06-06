@@ -9,7 +9,7 @@ interface Register {
 const register = ({ id, phoneNumber, lastUpdateAt }: Register) =>
   query(
     `
-      REPLACE INTO 
+      REPLACE INTO
       users
       SET
       id = ?,

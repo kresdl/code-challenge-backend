@@ -1,3 +1,5 @@
+import { NextFunction, Request, Response } from "express";
+
 export interface Message {
   $: {
     priority: string;
@@ -30,3 +32,5 @@ export interface SRTrafficAreas {
     ];
   };
 }
+
+export type AsyncRequestHandler = (request: Request, resposne: Response, next: NextFunction) => Promise<void>;
