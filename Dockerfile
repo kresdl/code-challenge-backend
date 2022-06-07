@@ -6,9 +6,10 @@ EXPOSE 5000
 FROM base as prod
 RUN npm ci
 COPY . .
-CMD ["sh", "start-prod.sh"]
+RUN node_modules/.bin/tsc -p .
+CMD ["node", "--experimental-specifier-resolution=node", "build/index.js"]
 
 FROM base as dev
 RUN npm i
 COPY . .
-CMD ["sh", "start-dev.sh"]
+CMD ["node_modules/.bin/nodemon", "src/index.ts"]
