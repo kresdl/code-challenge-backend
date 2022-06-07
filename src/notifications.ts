@@ -32,10 +32,9 @@ const notify = async (user: User) => {
 
     const areas = await parseXML<SRTrafficAreas>(areasXML);
     const area = areas.sr.area[0].$.name;
-    const now = dayjs();
 
     const lastUpdateAt = dayjs(user.lastUpdateAt);
-    const thisUpdateAt = now.format("YYYY-MM-DD HH:mm:ss");
+    const thisUpdateAt = dayjs();
 
     const { data: messagesXML } = await axiosClient.get(SR_TRAFFIC_MESSAGES_API, {
       params: {
@@ -63,7 +62,7 @@ const notify = async (user: User) => {
       to: phoneNumber,
     });
     updateLast(id, {
-      lastUpdateAt: thisUpdateAt,
+      lastUpdateAt: thisUpdateAt.format("YYYY-MM-DD HH:mm:ss"),
     });
   } catch (error) {
     console.error(error);
