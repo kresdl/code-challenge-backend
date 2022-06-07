@@ -6,7 +6,7 @@
 
 ##### Development setup:
 
-`npm run compose:dev`
+`make dev`
 
 ##### Authentication:
 
