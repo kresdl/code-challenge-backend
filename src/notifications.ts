@@ -61,7 +61,7 @@ const notify = async (user: User) => {
       from: TWILIO_NUMBER,
       to: phoneNumber,
     });
-    updateLast(id, {
+    await updateLast(id, {
       lastUpdateAt: thisUpdateAt.format("YYYY-MM-DD HH:mm:ss"),
     });
   } catch (error) {
