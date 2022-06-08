@@ -26,8 +26,9 @@ const response = {
 describe("can authenticate", () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    delete response.locals.userId;
   });
-  test.skip("grants access if idToken is valid", async () => {
+  test("grants access if idToken is valid", async () => {
     (getUserId as jest.Mock).mockResolvedValue(FAKE_ID);
     await auth(request, response, mockNext);
     expect(response.locals.userId).toBe(FAKE_ID);
