@@ -16,7 +16,7 @@ Authenticate with header `Authorization: Bearer <Id-token>`
 
 ##### Endpoint spec:
 
-`POST /subscribe { phoneNumber: string }` (Subscribe to service payload)
+`POST /subscribe { phoneNumber: string }` (Subscribe to service)
 
 `POST /update { latitude: number, longitude: number }` (Update position)
 

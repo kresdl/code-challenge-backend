@@ -16,9 +16,8 @@ export const parseXML = <T>(xml: string) =>
 
 export const compareMessageByDate =
   (date: dayjs.Dayjs) =>
-  ({ createddate }: Message) => {
-    return date.isBefore(createddate);
-  };
+  ({ createddate }: Message) =>
+    date.isBefore(createddate);
 
 const oAuthClient = new OAuth2Client(OAUTH_CLIENT_ID);
 
