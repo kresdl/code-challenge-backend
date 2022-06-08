@@ -1,13 +1,13 @@
 import { subscribe } from "../";
 import { register } from "../../models";
 
-jest.mock("../../models");
-jest.useFakeTimers();
-jest.setSystemTime(new Date("2020-10-10 11:11:11"));
-
 const FAKE_YESTERDAY = "2020-10-09 11:11:11";
 const FAKE_ID = "fake-id";
 const FAKE_PHONE = "+999999";
+
+jest.mock("../../models");
+jest.useFakeTimers();
+jest.setSystemTime(new Date("2020-10-10 11:11:11"));
 
 const mockRegister = (register as jest.Mock).mockResolvedValue({});
 const mockNext = jest.fn();

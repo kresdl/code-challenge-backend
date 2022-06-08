@@ -9,6 +9,7 @@ jest.mock("../../utils", () => ({
 
 const mockStatus = jest.fn().mockReturnThis();
 const mockSend = jest.fn();
+const mockNext = jest.fn();
 
 const request = {
   headers: {
@@ -22,24 +23,22 @@ const response = {
   send: mockSend,
 } as any;
 
-const next = jest.fn();
-
 describe("can authenticate", () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
   test.skip("grants access if idToken is valid", async () => {
     (getUserId as jest.Mock).mockResolvedValue(FAKE_ID);
-    await auth(request, response, next);
+    await auth(request, response, mockNext);
     expect(response.locals.userId).toBe(FAKE_ID);
-    expect(next).toHaveBeenCalled();
+    expect(mockNext).toHaveBeenCalled();
   });
 
   test("denies access if idToken is invalid", async () => {
     (getUserId as jest.Mock).mockRejectedValue({});
-    await auth(request, response, next);
+    await auth(request, response, mockNext);
     expect(response.locals.userId).toBeFalsy();
-    expect(next).not.toHaveBeenCalled();
+    expect(mockNext).not.toHaveBeenCalled();
     expect(response.status).toHaveBeenCalledWith(401);
     expect(response.send).toHaveBeenCalledWith(UNAUTHORIZED_MESSAGE);
   });

@@ -1,13 +1,16 @@
-import { RequestHandler } from "express";
 import { updatePosition as update } from "../models";
+import { AsyncRequestHandler } from "../types";
 
 const validateInput = (body: any) => {
   return Number.isFinite(body.latitude) && Number.isFinite(body.longitude);
 };
 
-const updatePosition: RequestHandler = async (req, res) => {
+const updatePosition: AsyncRequestHandler = async (req, res) => {
   const { body } = req;
-  if (!validateInput(body)) return res.status(400).send("Invalid position");
+  if (!validateInput(body)) {
+    res.status(400).send("Invalid position");
+    return;
+  }
   try {
     await update(res.locals.userId, body);
     res.sendStatus(200);

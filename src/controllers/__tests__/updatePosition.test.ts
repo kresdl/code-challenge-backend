@@ -1,11 +1,11 @@
 import { updatePosition } from "../";
 import { updatePosition as update } from "../../models";
 
-jest.mock("../../models");
-
 const FAKE_ID = "fake-auth";
 const FAKE_LATITUDE = 14.4343;
 const FAKE_LONGITUDE = 44.2543;
+
+jest.mock("../../models");
 
 const mockUpdatePosition = (update as jest.Mock).mockResolvedValue({});
 const mockNext = jest.fn();
