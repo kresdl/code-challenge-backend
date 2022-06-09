@@ -7,13 +7,20 @@ import getUsers from "./models/getUsers";
 import { User } from "./models/User";
 import dayjs from "dayjs";
 
-const { TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, TWILIO_NUMBER, SR_TRAFFIC_AREAS_API, SR_TRAFFIC_MESSAGES_API } =
-  process.env;
+const {
+  TWILIO_ACCOUNT_SID,
+  TWILIO_AUTH_TOKEN,
+  TWILIO_NUMBER,
+  SR_TRAFFIC_AREAS_API,
+  SR_TRAFFIC_MESSAGES_API,
+  API_BASE_URL,
+} = process.env;
 if (!TWILIO_ACCOUNT_SID) throw Error("TWILIO_ACCOUNT_SID not set");
 if (!TWILIO_AUTH_TOKEN) throw Error("TWILIO_AUTH_TOKEN not set");
 if (!TWILIO_NUMBER) throw Error("TWILIasdsadsaO_NUMBER not set");
 if (!SR_TRAFFIC_AREAS_API) throw Error("SR_TRAFFIC_AREAS_API not set");
 if (!SR_TRAFFIC_MESSAGES_API) throw Error("SR_TRAFFIC_MESSAGES_API not set");
+if (!API_BASE_URL) throw Error("API_BASE_URL not set");
 
 const axiosClient = axios.create({
   headers: { "Content-Type": "application/x-www-form-urlencoded" },
@@ -51,7 +58,8 @@ const notify = async (user: User) => {
       const exactLocation = "Location: " + msg.exactlocation;
       const description = "Description: " + msg.description;
       const category = "Category: " + msg.category;
-      return [msg.title, priority, createDate, exactLocation, description, category].join("\n");
+      const unsubscribe = `To unsubscribe, visit ${API_BASE_URL}/unsubscribe/${user.id}`;
+      return [msg.title, priority, createDate, exactLocation, description, category, unsubscribe].join("\n");
     });
 
     if (!formattedMessages.length) return;

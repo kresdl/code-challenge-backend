@@ -13,12 +13,12 @@ const subscribe: AsyncRequestHandler = async (req, res) => {
     return;
   }
   const { phoneNumber } = body;
-  const lastUpdateAt = dayjs().subtract(1, "day").format("YYYY-MM-DD HH:mm:ss");
+  const updatesFrom = dayjs().subtract(1, "day").format("YYYY-MM-DD HH:mm:ss");
   try {
     await register({
       id: res.locals.userId,
       phoneNumber,
-      lastUpdateAt,
+      updatesFrom,
     });
     res.sendStatus(200);
   } catch (error) {
