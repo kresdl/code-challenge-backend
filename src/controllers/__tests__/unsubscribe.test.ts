@@ -46,7 +46,7 @@ describe("can signout", () => {
     expect(mockStatus).toHaveBeenCalledWith(200);
   });
 
-  test("responds appropriately when user does not exist", async () => {
+  test("responds with 404 when user does not exist", async () => {
     request.params.userId = FAKE_ID;
     const mockDeleteUser = (deleteUser as jest.Mock).mockResolvedValue(false);
     await unsubscribe(request, response, mockNext);
