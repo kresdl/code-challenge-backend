@@ -37,7 +37,7 @@ describe("can subscribe", () => {
     expect(mockRegister).toHaveBeenCalledWith({
       id: FAKE_ID,
       phoneNumber: FAKE_PHONE,
-      lastUpdateAt: FAKE_YESTERDAY,
+      updatesFrom: FAKE_YESTERDAY,
     });
     expect(mockSendStatus).toHaveBeenCalledWith(200);
   });
