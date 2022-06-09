@@ -4,9 +4,9 @@ import bodyParser from "body-parser";
 
 const router = express.Router();
 
-router.get("/unsubscribe/:userId", unsubscribe);
-router.use("/", cors, bodyParser.json(), auth);
-router.post("/unsubscribe", unsubscribe);
+router.use("/", cors, bodyParser.json());
+router.use("/unsubscribe/:userId?", unsubscribe);
+router.use("/", auth);
 router.post("/subscribe", subscribe);
 router.post("/update", updatePosition);
 
