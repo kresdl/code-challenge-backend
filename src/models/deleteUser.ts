@@ -1,7 +1,7 @@
 import { query } from "../db";
 
-const deleteUser = (id: string) =>
-  query(
+const deleteUser = async (id: string) => {
+  const result = await query(
     `
       DELETE FROM
       users
@@ -10,5 +10,7 @@ const deleteUser = (id: string) =>
     `,
     [id]
   );
+  return !!result.affectedRows;
+};
 
 export default deleteUser;
