@@ -58,7 +58,7 @@ const notify = async (user: User) => {
       const exactLocation = "Location: " + msg.exactlocation;
       const description = "Description: " + msg.description;
       const category = "Category: " + msg.category;
-      const unsubscribe = `To unsubscribe, visit ${API_BASE_URL}/unsubscribe/${user.id}`;
+      const unsubscribe = `To unsubscribe, visit ${API_BASE_URL}/unsubscribe/${id}`;
       return [msg.title, priority, createDate, exactLocation, description, category, unsubscribe].join("\n");
     });
 
