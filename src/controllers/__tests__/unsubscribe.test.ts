@@ -27,7 +27,7 @@ describe("can signout", () => {
     delete request.params.userId;
   });
 
-  test("throug POST", async () => {
+  test("with implicit user id", async () => {
     response.locals.userId = FAKE_ID;
     await unsubscribe(request, response, mockNext);
     expect(mockDeleteUser).toHaveBeenCalledWith(FAKE_ID);
