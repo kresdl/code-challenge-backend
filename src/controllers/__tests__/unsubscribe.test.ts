@@ -1,5 +1,6 @@
 import { unsubscribe } from "..";
 import { deleteUser } from "../../models";
+import { BYE_HTML_PAGE } from "../unsubscribe";
 
 const FAKE_ID = "fake-id";
 
@@ -10,6 +11,7 @@ jest.mock("../../models", () => ({
 const mockStatus = jest.fn().mockReturnThis();
 const mockSend = jest.fn();
 const mockSendStatus = jest.fn();
+const mockSendFile = jest.fn();
 const mockNext = jest.fn();
 
 const request = {
@@ -20,6 +22,7 @@ const response = {
   status: mockStatus,
   send: mockSend,
   sendStatus: mockSendStatus,
+  sendFile: mockSendFile,
   locals: {},
 } as any;
 
@@ -44,9 +47,10 @@ describe("can signout", () => {
     await unsubscribe(request, response, mockNext);
     expect(mockDeleteUser).toHaveBeenCalledWith(FAKE_ID);
     expect(mockStatus).toHaveBeenCalledWith(200);
+    expect(mockSendFile).toHaveBeenCalledWith(BYE_HTML_PAGE);
   });
 
-  test("responds with 404 when user does not exist", async () => {
+  test("responds appropriately when user does not exist", async () => {
     request.params.userId = FAKE_ID;
     const mockDeleteUser = (deleteUser as jest.Mock).mockResolvedValue(false);
     await unsubscribe(request, response, mockNext);
